@@ -1,0 +1,16 @@
+[Unit]
+Description=Audio bridge: FIFO -> STM32 over ttyHS1
+Conflicts=arduino-router.service
+After=local-fs.target
+
+[Service]
+User=arduino
+SupplementaryGroups=dialout
+RuntimeDirectory=bridge
+RuntimeDirectoryPreserve=yes
+ExecStart=/home/arduino/bridge-tx -q /home/arduino/bridge.fifo
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

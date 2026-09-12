@@ -1,0 +1,12 @@
+# Enhanced-mode processor. Python 3.13 on the QRB2210 (aarch64, Debian 13).
+#
+# Versions are the ones this was verified against, not floors. numpy/scipy are
+# available as Debian packages (python3-numpy, python3-scipy) if you would
+# rather not build them; ai-edge-litert is not, and needs the venv.
+numpy==2.2.4
+scipy==1.15.3
+
+# TFLite runtime for YAMNet. ai-edge-litert ships a cp313 aarch64 wheel;
+# enhance.py falls back to tflite_runtime if this import fails, and runs with
+# the classifier disabled (Auto behaves as Flat) if neither is present.
+ai-edge-litert==2.2.0

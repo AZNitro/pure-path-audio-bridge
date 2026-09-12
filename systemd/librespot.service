@@ -1,0 +1,15 @@
+[Unit]
+Description=Spotify Connect (librespot -> FIFO)
+After=network-online.target bridge-tx.service
+Wants=network-online.target
+Requires=bridge-tx.service
+
+[Service]
+User=arduino
+ExecStart=/usr/bin/librespot --name "UNO Q" --backend pipe --device /home/arduino/audio.fifo \
+          --bitrate 320 --initial-volume 100 --disable-audio-cache --device-type avr --onevent /home/arduino/spotify-event.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

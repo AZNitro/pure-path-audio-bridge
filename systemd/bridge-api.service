@@ -1,0 +1,15 @@
+[Unit]
+Description=UNO Q audio bridge status/control page (port 8080)
+After=network-online.target bridge-tx.service
+Wants=network-online.target
+
+[Service]
+User=arduino
+StateDirectory=bridge
+WorkingDirectory=/home/arduino/webui
+ExecStart=/usr/bin/python3 /home/arduino/webui/bridge_api.py 8080
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

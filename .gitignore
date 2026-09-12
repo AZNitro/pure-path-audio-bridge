@@ -1,0 +1,32 @@
+# Build output
+build/
+build_*/
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+zephyr/
+.west/
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Local state that must never be published
+*.log
+*.result
+credentials.json
+*.pem
+*.key
+wpa_supplicant.conf
+NetworkManager/

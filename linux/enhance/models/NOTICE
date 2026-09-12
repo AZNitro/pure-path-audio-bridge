@@ -1,0 +1,31 @@
+YAMNet audio event classifier — third-party model files
+=======================================================
+
+yamnet.tflite
+  Source:   https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite
+  Upstream: Google YAMNet, TFLite build (TF Hub "lite-model/yamnet/tflite/1",
+            also published via Kaggle Models and the MediaPipe model garden).
+  License:  Apache License 2.0
+  SHA-256:  4d8b4a53282dc83ef04e3e7dbc4fbc98082e34e44ed798e16c3a0cdd4c584faf
+  Size:     4126810 bytes
+  Signature: input "waveform_binary" float32 [15600] (1.0 s @ 16 kHz, mono,
+             range -1..1); output float32 [1, 521] class scores.
+
+  Note: the canonical tfhub-lite-models URL
+    https://storage.googleapis.com/tfhub-lite-models/google/lite-model/yamnet/tflite/1.tflite
+  returned HTTP 403 on 2026-09-12, so the file was fetched from the Google
+  MediaPipe model bucket above. The tensor signature matches TF Hub
+  lite-model_yamnet_tflite_1 exactly, and it was verified to classify
+  silence / sine / noise correctly before being put into service.
+
+yamnet_class_map.csv
+  Source:   https://raw.githubusercontent.com/tensorflow/models/master/research/audioset/yamnet/yamnet_class_map.csv
+  Upstream: tensorflow/models, research/audioset/yamnet
+  License:  Apache License 2.0
+  SHA-256:  cdf24d193e196d9e95912a2667051ae203e92a2ba09449218ccb40ef787c6df2
+  Rows:     521 classes (header + 521 lines), columns index,mid,display_name
+
+Apache-2.0 full text: https://www.apache.org/licenses/LICENSE-2.0
+Both files are unmodified redistributions of the upstream artifacts.
+Retrieved 2026-09-12 for the UNO Q audio bridge "Enhanced" mode, where the
+model only selects among locally-authored EQ presets.

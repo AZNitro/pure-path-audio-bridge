@@ -1,0 +1,14 @@
+[Unit]
+Description=Enhanced mode processor: audio.fifo -> EQ/AI -> bridge.fifo
+After=bridge-tx.service
+Requires=bridge-tx.service
+
+[Service]
+User=arduino
+StateDirectory=bridge
+ExecStart=/home/arduino/venv/bin/python /home/arduino/enhance.py
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,59 @@
+/*
+ * Phase 2A overlay: SAI2_A (from Phase 1, working) + lpuart1 with DMA.
+ *
+ * GPDMA1 requests (RM0456): LPUART1_RX = 34, LPUART1_TX = 35, SAI2_A = 38.
+ * Channels: SAI2 keeps ch2; UART uses ch4 (tx) and ch5 (rx).
+ */
+
+#include <zephyr/dt-bindings/dma/stm32_dma.h>
+
+&gpdma1 {
+	status = "okay";
+};
+
+/*
+ * PLL2 -> exact 44.1 kHz.
+ *   src   = clk_msis @ 4 MHz (same source &pll1 uses on this board)
+ *   M = 1 -> VCO input 4 MHz (must be >=4 MHz or get_vco_input_range() = -ERANGE)
+ *   N = 56 + 3670/8192 = 56.44799805  -> VCO = 225.792 MHz  (in 128-544 and 150-420)
+ *   P = 20 -> PLL2P = 11,289,599.61 Hz  vs 256*44100 = 11,289,600  (-0.035 ppm)
+ * Integer N is impossible here: 11289600/4000000 = 1764/625, so N integer would
+ * need div-p a multiple of 625 (max 128). FRACN is mandatory.
+ */
+&pll2 {
+	status = "okay";
+	clocks = <&clk_msis>;
+	div-m = <1>;
+	mul-n = <56>;
+	fracn = <3670>;
+	div-p = <20>;
+	div-r = <2>;          /* required by st,stm32u5-pll-clock binding; output unused */
+};
+
+/* ---- SAI2 (Phase 1, verified) ---- */
+&sai2 {
+	status = "okay";
+	clocks = <&rcc STM32_CLOCK(APB2, 22)>,
+		 <&rcc STM32_SRC_PLL2_P SAI2_SEL(0)>;  /* SAI2SEL=0 = PLL2P */
+};
+
+&sai2_a {
+	status = "okay";
+	pinctrl-0 = <&sai2_sck_a_pb13 &sai2_fs_a_pc0 &sai2_sd_a_pb15>;
+	pinctrl-names = "default";
+	dmas = <&gpdma1 2 38 (STM32_DMA_PERIPH_TX | STM32_DMA_PRIORITY_HIGH |
+			      STM32_DMA_MEM_16BITS | STM32_DMA_PERIPH_16BITS)>;
+	dma-names = "tx";
+};
+
+/* ---- lpuart1: link to QRB2210, 3 Mbaud, RTS/CTS, DMA both directions ---- */
+&lpuart1 {
+	status = "okay";
+	current-speed = <3000000>;
+	hw-flow-control;
+	dmas = <&gpdma1 4 35 (STM32_DMA_PERIPH_TX | STM32_DMA_PRIORITY_HIGH |
+			      STM32_DMA_MEM_8BITS | STM32_DMA_PERIPH_8BITS)>,
+	       <&gpdma1 5 34 (STM32_DMA_PERIPH_RX | STM32_DMA_PRIORITY_VERY_HIGH |
+			      STM32_DMA_MEM_8BITS | STM32_DMA_PERIPH_8BITS)>;
+	dma-names = "tx", "rx";
+};
