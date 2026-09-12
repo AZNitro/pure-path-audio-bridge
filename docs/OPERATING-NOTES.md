@@ -67,6 +67,20 @@ resumes consuming once the ring reaches the 50 % prime level.
 Consequence: the next stream opens with up to half a ring of stale audio from the
 previous track glued to its front, and idle `fill_pct` is a misleading diagnostic.
 
-Fix: flush the ring in the same place that clears `primed` at `STREAM_GAP_MS`. Not
-urgent, not flashed — the audio path is otherwise unaffected and all error counters
-stay at zero.
+**It also breaks the CRC proof.** Measured 2026-09-12 with 20,480 bytes stranded:
+
+```
+sent_bytes=5292032 sent_crc32=5c906e27  stm32_consumed=5312512 stm32_crc32=36ee26b8  MISMATCH
+                                                    ^^^^^^^^^ 20,480 bytes more than were sent
+```
+
+20,480 / 65,536 = 31.2 %, exactly the stranded fill. The firmware consumed the stale
+bytes ahead of the test file, so both the byte count and the CRC differ. Re-running with
+the ring drained gave `5292032 / 5c906e27` on both sides — MATCH. So a MISMATCH whose
+`stm32_consumed` *exceeds* `sent_bytes` is this bug, not a corrupted link; the shortfall
+is the stale remainder, and a second run clears it.
+
+Fix: flush the ring in the same place that clears `primed` at `STREAM_GAP_MS`. Deferred,
+not flashed — the audio path is otherwise unaffected and all error counters stay at zero
+— but it should be the first firmware change after the freeze, because it can make a
+clean system look like it failed its own correctness test.

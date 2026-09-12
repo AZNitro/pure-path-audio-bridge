@@ -28,3 +28,8 @@ sent_bytes=<n> sent_crc32=<a>  stm32_consumed=<m> stm32_crc32=<b>  MATCH|MISMATC
 
 Both the counts and the CRCs must agree. `MISMATCH (old firmware: no crc in STATUS)`
 means the firmware predates the 32-byte STATUS payload and cannot report a CRC at all.
+
+If `stm32_consumed` is **larger** than `sent_bytes`, the difference is stale audio left
+in the PCM ring by an interrupted stream — see `docs/OPERATING-NOTES.md`. Run the check
+again; the first run drains the ring and the second matches. Check `fill_pct` in
+`/run/bridge/status.json` reads 0.0 before trusting a CRC result.
