@@ -38,6 +38,12 @@ reboot still clears them — that is what `/var/lib/bridge` is for). `enhance` a
 `bridge-api` get `/var/lib/bridge` via `StateDirectory=`, where the custom EQ and the
 per-context tweaks persist.
 
+## One source at a time
+
+librespot, MPD and upmpdcli all write into the same `audio.fifo`. Nothing arbitrates
+between them: if two play at once their blocks interleave and the result stutters.
+Disconnect Spotify before casting over UPnP, and vice versa.
+
 ## Volume must be at unity for bit-exactness
 
 Both MPD and librespot attenuate in the sample domain. `mpd.conf` uses a software mixer
@@ -45,3 +51,8 @@ and `librespot.service` starts at `--initial-volume 100`; anything less is still
 audio but no longer bit-exact, and the CRC check will not match a reference file. Use
 the amplifier for loudness. A Spotify client's own volume slider drives librespot's
 softvol, so leave it at maximum when you want the guarantee to hold.
+
+The UPnP control point's volume slider drives MPD's software mixer. For bit-exact
+playback keep it at 100 and use the amp; a slider at 0 gives silence and a dark VU.
+Because the control point writes that value straight into MPD, it also overwrites any
+volume set locally — check MPD's volume after casting, not before.
