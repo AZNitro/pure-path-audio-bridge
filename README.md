@@ -21,6 +21,8 @@ Local   ──────────────▶ MPD ─┘      (s16le 44.
                       STM32U585 / Zephyr: DMA RX ─▶ 64 KB ring ─▶ SAI2 master ─▶ PCM5102A
 ```
 
+![Architecture](docs/block_diagram.png)
+
 Key numbers: PLL2 gives 256 × 44.1 kHz with −0.035 ppm error; 3 Mbaud carries 222 kB/s clean against 176.4 kB/s needed; the sender paces on the STM32's ring fill (target 50 %) so the SAI never stops; STATUS every 100 ms carries counters plus a running CRC-32 of every byte handed to the DAC.
 
 ## Repository layout
